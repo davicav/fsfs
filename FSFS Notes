@@ -1,0 +1,186 @@
+Capítulo sobre correlação - Cap 3
+
+Introdução
+
+	Existem duas maneiras de reduzir o conjunto de features
+		* seleção de features - a partir da redução do espaço de mensuração descartando informações redundantes e insignificantes
+			! seleção supervisada = usa nome das classes das features
+			! seleção não supervisada = não utiliza nada
+		* extração de features - a partir da redução do número de features utilizando o espaço inicial para obter um novo espaço transformado
+
+
+O que o Cap propõe
+
+	Neste capítulo é explicado um algoritmo que usa uma seleção de features não supervisionada baseado na medição das similaridades entre as features para remover a redundância. Não exige nenhuma busca, portanto é rápido. 
+
+	O algoritmo consiste em dividir o conjunto de features inicial em subconjuntos ou clusters de features similiares. Features de clusters diferentes não são similares. A partir dai, extrai-se uma feature de cada cluster para constituir o novo espaço de features.
+
+
+Extração de features
+
+	Objetivo -> Reduzir o número de features a partir do espaço inicial. Isto é, mapear os pontos do espaço inicial em um novo espaço de ordem menor.
+
+		X = f(Y)
+
+		Y = [y1, y2, ..., yp] no espaço OMEGA_p
+
+		X = [x1, x2, ..., xp'] no espaço OMEGA_p'
+
+		onde, p' < p
+
+
+Seleção de features
+
+	Métodos convecionais consistem em avaliar diferentes subconjuntos de features usando algum tipo de índice (index) e selecionando o melhor entre eles. Normalmente, este índice mede a capcidade dos respectivos subconjuntos na classificação ou na clusterização, dependendo se o processo é supervisionado ou não.
+
+	Problema deste método é computacionalmente grande. A busca euxastiva é exponencial em termos do tamanho dos dados. Algumas heurísitcas, como branch and bound, algoritmos gulosos são populares para solucionar este problema.
+
+	Algoritmos que usam a seleção de features são também conhecidos como filter ou wrapper. O algoritmo que não faz uma classificação/clusterização é chamado filter. Por outro lado, algoritmos wrapper usam diretamente a classificação de algum classificador como critério de avaliação. O wrapper tem um desempenho melhor, apesar de um tempo de consumor maior.
+
+
+	Algoritmos Filter
+
+		Categorias de métodos para seleção não supervisionada:
+			* Métodos que maximizam o desempenho de clusterização, quantificado por um índice. Incluem o algoritmo de seleção sequencial de features não supervisionda, método baseado na máxima entropia e a recentemente desenvolvida abordagem neuro-fuzzy.
+			* Métodos que consideram a seleção de features baseado na dependência e relevância. O princípio é que qualquer feature contendo pouca ou nenhuma informação adicional é redundante é deve ser eliminada. Várias medições de dependência como coeficientes correlacionados, estatísticas de redundância, ou dependência linear vem sendo usados.
+
+
+	Algoritmos Wrapper
+
+		Na forma mais geral, algoritmos wrapper consistem em usar o desempenho de previsão de uma máquina de aprendizado para avaliar a utilidade relativa dos diferentes subconjuntos de variáveis. Na prática, é preciso definir:
+			i. como buscar o espaço de todos os subconjuntosde variáveis possíveis
+			ii. como avaliar o desempenho de previsão de uma máquina de aprendizado para guiar a busca e pará-la
+			iii. que preditor usar
+
+		Várias estratégias de busca podem ser usadas, incluindo breadth-first, branch-and-bound, simulated annealing e algoritmos genéticos. Preditores populares incluem árvores de decisão, naive Bayes, least square linear predictors e support vector machines.
+
+		Como wrappers usam máquinas de aprendizado como uma caixa preta, eles são bastente gerais e simples. 
+
+
+Seleção de features usando similaridades de features (FSFS)
+
+	Aqui é descrito um algoritmo não supervisionado que está classificado como um algoritmo filter. O método usa as dependências/similaridades das features para reduzição de redundância sem precisar de uma busca. Ele consiste em particionar o conjunto de features inicial em diferentes subconjuntos ou clusters onde as features em um mesmo cluster possuem uma grande similaridade enquanto features de clusters diferentes não. Uma feature de cada cluster é selecionada para formar o subconjunto reduzido.
+
+	Uma nova medida de similaridade, chamada maximal information compression index, é usada na clusterização. É feita a comparação entre ela e outras duas medidas chamadas, coeficiente de correlação e a least square regression error. É também explicado como a representação da entropia pode ser usada para quantificar a redundância de um conjunto.
+
+	Objetivos da clusterização e da similaridade de features são minimizar a perda de informações no processo de redução e minimizar a redundância presente no subconjunto reduzido.
+
+
+	Medidas de similaridades de features
+
+		Aqui é discutido alguns critérios para mediar a similaride de features de duas variáveis aleatórias, baseada na dependência linar entre elas. Neste contexto é apresentado a medida maximal information compression index para ser utilizado na seleção da feature.
+
+		Existem duas maneiras de medir a similaridade entre duas variáveis randômicas. Uma é testar não-parametricamente a proximidade das distribuições de probabilidade das variáveis. Uma outra maneira é medir a quantidade da dependência (linear ou superior) entre as variáveis. Existem vários benéficios de escolher a dependência linear como medida de similaridade. É conhecido que se algumas features são linearmente dependentes de outras, e se o dado é linearmente separável da representação original, o dado ainda é linearmente separável se todas menos uma feature linearmente dependente são removidas.
+
+		No respeito ao conteúdo da informação dos dados, estatísticas de segunda ordem dos dados são os critérios mais importantes depois da média dos dados. Todas as medidas de dependência linear que iremos discutir estão relacionados com a quantidade de erros em termos de estatísticas de segunda ordem, em prever uma das variáveis ​​através da outra.
+
+		Será discutido duas medidas de dependência linear antes de explicar o maximal information compression index
+
+
+		Coeficiente de correlação (ρ)
+
+			A mais conhecida medida de similaridade entre duas variáveis aleatórias
+
+			O coeficiente de correlação entre duas variáveis x1 e x2 é definida como:
+
+			ρ(x1,x2) = cov(x1,x2) / sqrt(var(x1)var(x2))
+
+			onde var() é a variância e cov a covariância
+
+			se x1 e x2 são completamente correlacionados então a dependência linear existe e ρ(x1,x2) = 1 ou -1. Caso contrário, se x1 e x2 são totalmente não correlacinados ρ(x1,x2) = 0. Portanto, 1 - |ρ(x1,x2)| pode ser usado como medida de similaridade entre as duas variáveis. O seguinte pode ser afirmado
+
+			1. 0 <= 1 - |ρ(x1,x2)| <=1
+			2. 1 - |ρ(x1,x2)| = 0 sse x1 e x2 são linearmente relacionados
+			3. 1 - |ρ(x1,x2)| = 1 - |ρ(x2,x1)| (simetria)
+			4. se u = (x1 - a) / c e v = (x2 - b) / d para algumas constantes a,b,c,d, então 1 - |ρ(x1,x2)| = 1 - |ρ(u,v)| isto é, a medida é invariante para a ampliação e translação da variável
+			5. a medida é sensível à rotação do diagrama de dispersão no plano (x1,x2)
+
+			Apesar de o coeficiente de correlação apresentar propriedades desejáveis como medida de similaridade, as propriedades 4 e 5, fazem dela uma medida inadequada para a seleção de features. Uma vez que a medida é invariante para dimensionamento, dois pares de variáveis ​​que têm variâncias diferentes podem ter o mesmo valor da medida de similaridade, o que não é desejável desde que a variância tem elevado conteúdo informativo. Sensibilidade à rotação também não é desejada em várias aplicações.
+
+
+		Least square regression error (e)
+
+			Outra medida de grau de dependência linear entre duas variáveis x1 e x2 é o erro em prever x2 do modelo linear x2 = a + bx1. a e b são coeficientes de regressão obtidos pela minimização do erro médio quadrático 
+
+			e(x1,x2)^2 = 1/n * ∑(ei(x1,x2))^2, ei(x1,x2) = x2i - a - bx1i
+
+			os coeficientes são dados por a = ̄x2̄ e b = cov(x1,x2)/var(x1)
+
+			e a média do erro quadrático e(x1,x2) por var(x2)(1 - ρ(x1,x2)^2)
+
+			Se x2 e x1 são linearmente relacionados e(x1,x2) = 0 e se são completamente não correlacionados e(x1,x2) = var(x2).
+
+			A medida eˆ2 também é conhecida como variância residual. É a quantidade da variância de x2 inexplicada pelo modelo linear. Algumas propriedades são:
+
+			1. 0 ≤ e(x1, x2) ≤ var(x2).
+			2. e(x1,x2) = 0 sse x1 and x2 são linearmente relacionados
+			3. e(x1, x2) != e(x2, x1) (não é simétrico).
+			4. se u = x1/c e v = x2/d para algumas constantes a,b,c,d, então e(x1,x2) = d^2e(u,v), i.e., a medida e é sensível à ampliação das variáveis. Também é claro que e é invariante à translação da variável.
+			5. A medida e é sensível à rotação do diagrama de dispersão no plano x1 - x2.
+
+			Note que a medida e não é simétrica (propriedade 3). Além disso, é sensível a rotação (propriedad 5).
+
+			Agora será apresentado uma medida de dependência linear que possue várias propriedades desejáveis inexistentes nas duas primeiras medidas.
+
+
+		Maximal information compression index (λ2)
+
+			Seja Σ a matriz de covariância das variáveis aleatórias x1 e x2. Defina, maximal information compression index como λ2(x1,x2) = menor autovalor de Σ, i.e,
+
+			2λ2(x1, x2) = (var(x1) + var(x2) − sqrt((var(x1) + var(x2))^2 − 4var(x1)var(x2)(1 − ρ(x1, x2)^2))
+
+			O valor de λ2 é zero quando as features são linearmente dependentes e aumenta à medida que a dependência diminui. 
+
+			It may be noted that the measure λ2 is nothing but the eigenvalue for the direction normal to the principle component direction of feature pair (x1,x2). The corresponding loss of information in reconstruction of the pattern (in terms of second order statistics) is equal to the eigenvalue along the direction normal to the principal component. Hence, λ2 is the amount of reconstruction error committed if the data is projected to a reduced (in this case reduced from two to one) dimension in the best possible way. Therefore, it is a measure of the minimum amount of information loss or the maximum amount of information compression possible.
+
+			O significado de λ2 pode ser geometricamente explicado em termos da regressão linear. o valor de λ2 é igual a soma dos quadrados das distâncias perpendiculares dos pontos (x1,x2) à melhor linha de ajuste x2 = â + ˆbx1, obtida por minimizar a soma dos quadrados das distâncias perpendiculares. os coeficientes de tal melhor linha de ajuste são dados por
+
+			â = ̄x1̄ cotθ + ̄x2̄ 
+
+			e 
+
+			ˆb = cotθ , onde θ = 2 tan̄1 (2cov(x1,x2)/var(x1)^2-var(x2)^2)
+
+			Propriedades de λ2:
+
+			1. 0 ≤ λ2(x1, x2) ≤ 0.5(var(x1) + var(x2)).
+			2. λ2(x1,x2) = 0 if and only if x1 and x2 are linearly related.
+			3. λ2(x1, x2) = λ2(x2, x1) (symmetric).
+			4. If u = x1/c and v = x2/d for some constant a,b,c,d, then λ2(x1,x2) ≠ λ2(u,v); i.e., the measure is sensitive to scaling of the variables. Since the expression of λ2 does not contain mean, but only the variance and covariance terms, it is invariant to translation of the data set.
+			5. λ2 is invariant to rotation of the variables about the origin (this can be easily verified from the geometric interpretation of λ2 considering the property that the perpendicular distance of a point to a line does not change with rotation of the axes).
+
+			The measure λ2 possesses several desirable properties such as symmetry (property 3), sensitivity to scaling (property 4), and invariance to rotation (property 5). It is a property of the variable pair (x1, x2) reflecting the amount of error committed if maximal information compression is performed by re- ducing the variable pair to a single variable. Hence, it may be suitably used in redundancy reduction.
+
+
+	Seleção de features a partir da clusterização
+
+		Constitue-se de duas fases: 
+			i. particionamento do conjunto de features original em um número de subconjuntos (clusters) homogêneos
+			ii. seleção da feature representante de cada cluster
+
+		Partitioning of the features is done based on the k-NN principle using one of the feature similar- ity measures described in Section 3.4.1. In doing so, the k nearest features of each feature are computed first. Among them the feature having the most compact subset (as determined by its distance to the farthest neighbor) is se- lected, and its k neighboring features are discarded. The process is repeated for the remaining features until all of them are either selected or discarded.
+
+		While determining the k nearest neighbors of features a constant error threshold (ε) is assigned; ε is set equal to the distance of the kth nearest neighbor of the feature selected in the first iteration. In subsequent itera- tions, it is checked whether the λ2 value, corresponding to the subset of a feature, is greater than ε or not. If yes, the value of k is decreased. Therefore k may be varying over iterations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
