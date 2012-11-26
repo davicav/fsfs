@@ -17,6 +17,7 @@ onde as linhas são as instâncias e as colunas as features
 
   fsfs.py - onde é feito os cálculos das métricas e visualizada uma matrix de
   similaridades
+
   entro.py - onde é feita a análise da escolha das features
 
 Não é abordado aqui como fazer a escolha. Você analisa os dados e faz suas

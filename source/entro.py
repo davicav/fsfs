@@ -4,6 +4,7 @@ import getopt
 import sys
 
 # input: the list of features of i and j and info about the matrix
+#
 # return: distancy between i and j
 def dist(i, j, m_info):
     len_cols = m_info['len_cols']
@@ -11,12 +12,14 @@ def dist(i, j, m_info):
     minf = m_info['minf']
 
     dist = 0
+    # for each feature get the distance of the points for that feature
     for l in range(len_cols):
         dist += ((float(i[l]) - float(j[l]))/(maxf[l]-minf[l]))**2
 
     return math.sqrt(dist)
 
 # input: the list of features of i and j and info about the matrix
+#
 # return: similiraty of the attributes i and j
 def sim(i, j, m_info):
     alfa = -math.log(0.5) / 0.3 # missing the " / avg(dist)"
@@ -31,8 +34,8 @@ def get_info(m):
     len_rows = len(m)
     len_cols = len(m[0])
 
-    minf = [sys.float_info.max for row in range(len_cols)]
-    maxf = [sys.float_info.min for row in range(len_cols)]
+    minf = [sys.float_info.max for col in range(len_cols)]
+    maxf = [sys.float_info.min for col in range(len_cols)]
 
     for col in range(len_cols):
         for row in range(len_rows):
@@ -57,17 +60,17 @@ def get_info(m):
 def entropy(m):
     m_info = get_info(m)
     len_rows = m_info['len_rows']
-    entropy = 0
+    entropy = 0.0
 
     for i in range(len_rows):
-        for j in range(len_rows):
-            sim_ij = sim(m[i], m[j], m_info)
-            print "sim_ij = %f" % sim_ij
-            print "alsdfjalsdkj"
-            entropy += (sim_ij*math.log(sim_ij) + (1-sim_ij)*math.log(1-sim_ij))
+        for j in range(i+1,len_rows):
+            if m[i] != m[j]:
+                sim_ij = sim(m[i], m[j], m_info)
+                entropy += (sim_ij*math.log(sim_ij) + (1-sim_ij)*math.log(1-sim_ij))
 
-    return -entr
+    return -entropy
 
+###############################################################################
 class Usage(Exception):
     def __init__(self, msg):
         self.msg = msg
