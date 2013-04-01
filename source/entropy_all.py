@@ -2,6 +2,7 @@ import math
 import csv
 import getopt
 import sys
+from os.path import basename
 
 
 def dist(i, j, m_info):
@@ -64,6 +65,7 @@ def get_info(m):
         'minf': minf,
         'maxf': maxf,
     }
+    print info
     return info
 
 
@@ -114,7 +116,6 @@ def entropy(m):
 
     return -entropy
 
-
 ###############################################################################
 class Usage(Exception):
     def __init__(self, msg):
@@ -138,6 +139,7 @@ def main(argv=None):
 
         if not args:
             raise Usage("Sem argumentos")
+        total = 0
         for arg in args:
             matrix = []
             with open(arg, 'rb') as csvfile:
@@ -145,8 +147,11 @@ def main(argv=None):
                 for row in cr:
                     matrix.append(row[:-1])
 
-            print "Entropy of %s = %f" % (arg, entropy(matrix))
+            ent = entropy(matrix)
+            print "Entropy of %s = %f" % (basename(arg), ent)
 
+            total += ent
+        print "Media of entropy = %f" % (total / len(args))
     except Usage, err:
         print >> sys.stderr, err.msg
         print >> sys.stderr, "Para ajuda -h ou --help"
