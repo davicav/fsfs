@@ -65,7 +65,6 @@ def get_info(m):
         'minf': minf,
         'maxf': maxf,
     }
-    print info
     return info
 
 
