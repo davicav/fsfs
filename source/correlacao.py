@@ -136,7 +136,7 @@ def main(argv=None):
             colorbar()
             show(matrix)
         else:
-            print 'Uso: python', argv[0], '-i input.arff -a algorithm'
+            print 'Uso: python', argv[0], '-i input.arff -a algorithm[1,2,3]'
 
 
         # processa os argumentos
@@ -149,4 +149,3 @@ def main(argv=None):
 
 if __name__ == '__main__':
     sys.exit(main())
-
